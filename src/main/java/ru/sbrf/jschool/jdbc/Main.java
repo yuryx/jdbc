@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.sql.*;
 
 public class Main {
-    public static final String CONNECT_URL = "jdbc:h2:tcp://localhost/C:\\Users\\sbt-mikhiyenko-yua\\Documents\\Java-школа\\JDBC1\\jdbctest\\test.db";
+    public static final String CONNECT_URL = "jdbc:h2:tcp://localhost/C:\\TEST\\test.db";
     public static final String GET_PERSON_QUERY = "SELECT * FROM BANK.PERSON";
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
 

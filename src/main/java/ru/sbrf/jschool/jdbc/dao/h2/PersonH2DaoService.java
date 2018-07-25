@@ -23,6 +23,7 @@ public class PersonH2DaoService extends AbstractH2DaoService implements PersonDa
             int i = 0;
             Person person = null;
             while (resultSet.next()) {
+                i++;
                 if (i > 1) {
                     throw new PersonDaoException("More than one row");
                 }

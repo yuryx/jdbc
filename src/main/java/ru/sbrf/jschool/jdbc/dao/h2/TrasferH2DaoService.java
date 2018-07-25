@@ -4,10 +4,7 @@ import ru.sbrf.jschool.jdbc.domen.Account;
 import ru.sbrf.jschool.jdbc.exceptions.DaoException;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 /**
  * Created by SBT-Pozdnyakov-AN on 02.11.2017.
@@ -19,16 +16,10 @@ public class TrasferH2DaoService extends AbstractH2DaoService{
         try {
             connection = getConnection(AbstractH2DaoService.CONNECT_URL);
             connection.setAutoCommit(false);
-            Statement statement = connection.createStatement();
-            //statement.executeUpdate("UPDATE BANK.ACCOUNT SET balance = balance - "+amount +" WHERE number="+accFrom);
-            boolean debug = true;
-            if(debug){
-                throw new RuntimeException("TERRRRRIBLE ERROR!!!!");
-            }
-            statement.executeUpdate("UPDATE BANK.ACCOUNT SET balance = balance + "+amount +" WHERE number="+accTo);
+            changeBalance(connection, accFrom, amount.negate());
+            changeBalance(connection,accTo, amount);
             connection.commit();
             //finally is here
-            statement.close();
             connection.close();
         } catch (DaoException e) {
             e.printStackTrace();
@@ -38,4 +29,22 @@ public class TrasferH2DaoService extends AbstractH2DaoService{
             connection.rollback();
         }
     }
+
+    protected void changeBalance(final Connection connection, String account, BigDecimal amount) throws SQLException {
+        try {
+            PreparedStatement pstmt = connection.prepareStatement("SELECT balance from BANK.ACCOUNT where number=?",
+                    ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
+            pstmt.setString(1,account);
+            ResultSet rset = pstmt.executeQuery();
+            rset.next();
+            final BigDecimal balance = rset.getBigDecimal("balance");
+            rset.updateBigDecimal("balance", balance.add(amount));
+            rset.updateRow();
+            rset.close();
+        }catch (SQLException e) {
+            e.printStackTrace();
+        };
+    }
+
+
 }
